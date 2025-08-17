@@ -107,6 +107,7 @@ qt5_add_resources(SHADER_RSC_ADDED ${SRC_DIR}/resources.qrc)
 ###########
 add_executable(file_player ${File_Player_QTLib_src} ${File_Player_QTLib_hdr} ${File_Player_QTBin_src} ${SHADER_RSC_ADDED} ${File_Player_QTLib_ui_moc})     
 
+
 add_dependencies(file_player file_player_msgs_generate_messages_cpp ${PROJECT_NAME}_gencfg)
 add_dependencies(file_player ${catkin_EXPORTED_TARGETS})
 
@@ -123,4 +124,18 @@ target_link_libraries(file_player
 )
 
 
-
+##############
+## Headless ##
+##############
+add_executable(file_player_headless
+  src/headless_player.cpp
+  src/ROSThread.cpp
+)
+target_link_libraries(file_player_headless
+  ${catkin_LIBRARIES}
+  Qt5::Core
+)
+add_dependencies(file_player_headless
+  ${catkin_EXPORTED_TARGETS}
+  ${PROJECT_NAME}_gencfg
+)
