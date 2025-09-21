@@ -57,6 +57,9 @@ MainWindow::MainWindow(QWidget *parent) :
   ui_->horizontalSlider->setValue(0);
   slider_value_ = 0;
 
+  // Stepper UI
+  connect(ui_->stepButton, SIGNAL(pressed()), this, SLOT(StepPressed()));
+
 }
 
 MainWindow::~MainWindow()
@@ -203,4 +206,17 @@ void MainWindow::SliderValueApply()
 {
   my_ros_->ResetProcessStamp(slider_value_);
   slider_checker_ = false;
+}
+
+void MainWindow::StepPressed()
+{
+  // Read number of frames to step from UI and forward to ROSThread
+  int n = ui_->stepSpinBox->value();
+  if(n <= 0) return;
+  my_ros_->StepFrames(n);
+
+  // Ensure UI shows playback is paused after stepping completes.
+  pause_flag_ = false;
+  my_ros_->pause_flag_ = false;
+  this->ui_->pushButton_3->setText(QString::fromStdString("Pause"));
 }

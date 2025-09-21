@@ -359,6 +359,22 @@ ROSThread::DataStampThread()
       radarpolar_thread_.push(stamp);
       radarpolar_thread_.cv_.notify_all();
     }
+
+    // Update processed_stamp_ to reflect this stamp so stepping and slider work
+    processed_stamp_ = stamp - initial_data_stamp_;
+
+    // Handle stepper: if step_remaining_ > 0, decrement and pause when done
+    if(step_remaining_.load() > 0)
+    {
+      int remaining = --step_remaining_;
+      if(remaining <= 0)
+      {
+        pause_flag_ = true; // pause playback after stepping completes
+        // notify GUI about final stamp
+        emit StampShow(stamp);
+      }
+    }
+
     stamp_show_count_++;
     if(stamp_show_count_ > 100)
     {
@@ -781,4 +797,18 @@ void ROSThread::SaveRosbag()
   }
   cout<<"rosbag stored at: "<<bag_path<<endl;
   bag.close();
+}
+
+int ROSThread::GetStepRemaining()
+{
+  return step_remaining_.load();
+}
+
+void ROSThread::StepFrames(int n)
+{
+  if(n <= 0) return;
+  step_remaining_.store(n);
+  // ensure playback runs until steps complete
+  pause_flag_ = false;
+  play_flag_ = true;
 }

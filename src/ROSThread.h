@@ -56,6 +56,7 @@
 #include <thread>
 #include <mutex>
 #include <condition_variable>
+#include <atomic>
 
 //pcl
 #include <pcl_conversions/pcl_conversions.h>
@@ -118,6 +119,7 @@ public:
     void SaveRosbag();
     void Ready();
     void ResetProcessStamp(int position);
+    int GetStepRemaining();
 
 signals:
     void StampShow(quint64 stamp);
@@ -176,6 +178,8 @@ private:
     int64_t pre_timer_stamp_;
 
     bool reset_process_stamp_flag_;
+    std::mutex step_mutex_;
+    std::atomic<int> step_remaining_{0};
 
     pair<string,sensor_msgs::PointCloud2> ouster_next_;
     pair<string,cv::Mat> radarpolar_next_; // giseop     
@@ -183,6 +187,7 @@ private:
     int GetDirList(string dir, vector<string> &files);
 
 public slots:
+    void StepFrames(int n);
 
 };
 

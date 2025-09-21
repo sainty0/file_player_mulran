@@ -62,6 +62,7 @@ private slots:
   void SliderValueChange(int value);
   void SliderPressed();
   void SliderValueApply();
+  void StepPressed();
 
 signals:
   void setThreadFinished(bool);
@@ -75,6 +76,7 @@ private:
   bool loop_flag_;
   bool stop_skip_flag_;
   int slider_value_;
+  int step_value_;
 
   int slider_checker_;
 

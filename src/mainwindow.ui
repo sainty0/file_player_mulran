@@ -232,7 +232,36 @@ QFrame#line,#line_2,#line_3,#line_4,#line_5,#line_6,#line_7,#line_8,#line_9,#lin
       <item>
        <widget class="QDoubleSpinBox" name="doubleSpinBox"/>
       </item>
-     </layout>
+
+      <item>
+       <widget class="QLabel" name="label_step">
+        <property name="text">
+         <string>Step</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="stepSpinBox">
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>1000000</number>
+        </property>
+        <property name="value">
+         <number>500</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="stepButton">
+        <property name="text">
+         <string>Step</string>
+        </property>
+       </widget>
+      </item>
+
+       </layout>
     </item>
     <item>
      <widget class="Line" name="line">
