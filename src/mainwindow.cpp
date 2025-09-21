@@ -19,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
   connect(my_ros_, SIGNAL(StampShow(quint64)), this, SLOT(SetStamp(quint64)));
   connect(my_ros_, SIGNAL(StartSignal()), this, SLOT(Play()));
+  connect(my_ros_, SIGNAL(StepCompleted(quint64)), this, SLOT(StepCompleted(quint64)));
 
   connect(ui_->quitButton, SIGNAL(pressed()), this, SLOT(TryClose()));
   connect(ui_->pushButton, SIGNAL(pressed()), this, SLOT(FilePathSet()));
@@ -219,4 +220,19 @@ void MainWindow::StepPressed()
   pause_flag_ = false;
   my_ros_->pause_flag_ = false;
   this->ui_->pushButton_3->setText(QString::fromStdString("Pause"));
+}
+
+void MainWindow::StepCompleted(quint64 stamp)
+{
+  // Update UI to reflect stepping finished
+  play_flag_ = false;
+  my_ros_->play_flag_ = false;
+  this->ui_->pushButton_2->setText(QString::fromStdString("Play"));
+
+  pause_flag_ = true;
+  my_ros_->pause_flag_ = true;
+  this->ui_->pushButton_3->setText(QString::fromStdString("Resume"));
+
+  // Ensure the stamp label/slider reflect final stamp (StampShow already emits, but set explicitly)
+  SetStamp(stamp);
 }

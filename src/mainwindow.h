@@ -62,6 +62,7 @@ private slots:
   void SliderValueChange(int value);
   void SliderPressed();
   void SliderValueApply();
+  void StepCompleted(quint64 stamp);
   void StepPressed();
 
 signals:

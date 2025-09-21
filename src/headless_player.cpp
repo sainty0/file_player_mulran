@@ -62,6 +62,18 @@ FilePlayerNode::FilePlayerNode(const po::variables_map& vm, ros::NodeHandle& nh_
   player_.play_flag_        = true;
 
   player_.Ready();
+
+  // If requested, seek to a start position (percent 0..100) before starting playback.
+  if (vm.count("start-percent")) {
+    double pct = vm["start-percent"].as<double>();
+    if (pct > 0.0) {
+      // Convert percent (0..100) to slider units (0..10000).
+      int slider_pos = static_cast<int>(std::max(0.0, std::min(100.0, pct)) * 100.0);
+      if (slider_pos >= 10000) slider_pos = 9999;
+      player_.ResetProcessStamp(slider_pos);
+    }
+  }
+
   player_.start();
 
   // Optional "step" mode: step N frames then exit
@@ -95,7 +107,8 @@ int main(int argc, char** argv)
       ("dir,d",    po::value<std::string>()->required(), "Sequence directory root")
       ("rate,r",   po::value<double>()->default_value(1.0), "Playback speed multiplier")
       ("loop",     po::bool_switch()->default_value(false), "Loop sequence")
-      ("step,s",   po::value<int>()->default_value(0), "Step N frames and exit");
+      ("step,s",   po::value<int>()->default_value(0), "Step N frames and exit")
+      ("start-percent", po::value<double>()->default_value(0.0), "Start position as percent (0..100)");
 
   po::variables_map vm;
   try {

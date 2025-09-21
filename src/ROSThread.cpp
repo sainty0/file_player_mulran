@@ -74,6 +74,9 @@ ROSThread::ros_initialize(ros::NodeHandle &n)
 
   start_sub_  = nh_.subscribe<std_msgs::Bool>("/file_player_start", 1, boost::bind(&ROSThread::FilePlayerStart, this, _1));
   stop_sub_   = nh_.subscribe<std_msgs::Bool>("/file_player_stop", 1, boost::bind(&ROSThread::FilePlayerStop, this, _1));
+  // stepping API: subscribe to integer topic for N-step requests and bool topic for single-step
+  step_sub_ = nh_.subscribe<std_msgs::Int32>("/file_player_step", 1, boost::bind(&ROSThread::StepTopicCallback, this, _1));
+  step_once_sub_ = nh_.subscribe<std_msgs::Bool>("/file_player_step_once", 1, boost::bind(&ROSThread::StepOnceCallback, this, _1));
 
   clock_pub_ = nh_.advertise<rosgraph_msgs::Clock>("/clock", 1);
   gps_pub_ = nh_.advertise<sensor_msgs::NavSatFix>("/gps/fix", 1000);
@@ -369,9 +372,12 @@ ROSThread::DataStampThread()
       int remaining = --step_remaining_;
       if(remaining <= 0)
       {
-        pause_flag_ = true; // pause playback after stepping completes
-        // notify GUI about final stamp
+        // pause and stop playback when requested steps complete
+        pause_flag_ = true;
+        play_flag_ = false;
+        // notify GUI about final stamp and signal step completion
         emit StampShow(stamp);
+        emit StepCompleted(stamp);
       }
     }
 
@@ -703,6 +709,24 @@ ROSThread::FilePlayerStop(const std_msgs::BoolConstPtr& msg)
   play_flag_ = true;
 
   emit StartSignal();
+}
+
+
+void
+ROSThread::StepTopicCallback(const std_msgs::Int32ConstPtr& msg)
+{
+  if(!msg) return;
+  int n = msg->data;
+  if(n <= 0) return;
+  StepFrames(n);
+}
+
+
+void
+ROSThread::StepOnceCallback(const std_msgs::BoolConstPtr& msg)
+{
+  if(!msg) return;
+  if(msg->data) StepFrames(1);
 }
 
 

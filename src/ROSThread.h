@@ -36,6 +36,7 @@
 #include <std_msgs/Bool.h>
 #include <std_srvs/SetBool.h>
 #include <std_msgs/Int64MultiArray.h>
+#include <std_msgs/Int32.h>
 #include <std_msgs/Float32.h>
 #include <std_msgs/Float64.h>
 #include <sensor_msgs/NavSatFix.h>
@@ -124,6 +125,7 @@ public:
 signals:
     void StampShow(quint64 stamp);
     void StartSignal();
+    void StepCompleted(quint64 stamp);
 
 private:
 
@@ -135,6 +137,8 @@ private:
 
     ros::Subscriber start_sub_;
     ros::Subscriber stop_sub_;
+    ros::Subscriber step_sub_;
+    ros::Subscriber step_once_sub_;
 
     // ros::Publisher imu_origin_pub_;
     ros::Publisher gps_pub_;
@@ -168,6 +172,8 @@ private:
 
     void FilePlayerStart(const std_msgs::BoolConstPtr& msg);
     void FilePlayerStop(const std_msgs::BoolConstPtr& msg);
+    void StepTopicCallback(const std_msgs::Int32ConstPtr& msg);
+    void StepOnceCallback(const std_msgs::BoolConstPtr& msg);
 
     std::vector<string> ouster_file_list_;
     std::vector<string> radarpolar_file_list_;
