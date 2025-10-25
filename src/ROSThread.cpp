@@ -406,16 +406,21 @@ ROSThread::DataStampThread()
     if(loop_flag_ == false && iter == prev(data_stamp_.end(),1))
     {
       play_flag_ = false;
-      while(!play_flag_)
-      {
-        iter = data_stamp_.begin();
-        stop_region_iter = stop_period_.begin();
-        processed_stamp_ = 0;
-        usleep(10000);
-      }
+
+      // Optional UI hooks
+      emit StampShow(stamp);
+      emit StepCompleted(stamp);   // or add a dedicated PlaybackFinished()
+
+      // Make worker loops stop promptly (optional but tidy)
+      data_stamp_thread_.active_ = false;
+      gps_thread_.active_        = false;
+      imu_thread_.active_        = false;
+      ouster_thread_.active_     = false;
+      radarpolar_thread_.active_ = false;
+
+      ros::shutdown();            // cleanly closes THIS node/process
+      return;                     // exit DataStampThread
     }
-
-
   }
   cout << "Data publish complete" << endl;
 }
